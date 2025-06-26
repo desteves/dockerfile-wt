@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     gcc \
     g++ \
-    linux-headers-amd64 \
+    libstdc++-12-dev \
     git \
     libtool \
     autoconf \
@@ -17,10 +17,12 @@ RUN apt-get update && apt-get install -y \
     jq \
     liblz4-dev \
     zlib1g-dev \
+    libmemkind-dev \
     libsnappy-dev \
     libsodium-dev \
     libzstd-dev \
     python3-dev \
+    libsnappy-dev \
     && apt-get clean
 
 # Fetch the WiredTiger release dynamically
@@ -38,10 +40,11 @@ RUN mkdir /wiredtiger/build
 
 # Configure the WiredTiger build
 RUN cmake -S /wiredtiger -B /wiredtiger/build \
+    -DENABLE_SNAPPY=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_WERROR=0 \
-    -DENABLE_QPL=0 \  
-    -DCMAKE_C_FLAGS="-Wno-error=array-bounds -O0" \
+    -DENABLE_QPL=0 \
+    -DCMAKE_C_FLAGS="-O0 -Wno-error -Wno-format-overflow -Wno-error=array-bounds -Wno-error=format-overflow -Wno-error=nonnull" \
     -DPYTHON_EXECUTABLE=$(which python3)
 
 # Build WiredTiger
