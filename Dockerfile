@@ -1,5 +1,5 @@
 # Use the official Python 3 base image (Debian-based)
-FROM python:3.12
+FROM  --platform=linux/amd64 python:3.12
 
 # Install necessary build tools and libraries
 RUN apt-get update && apt-get install -y \
@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y \
     libsodium-dev \
     libzstd-dev \
     python3-dev \
-    libsnappy-dev \
     && apt-get clean
 
 # Fetch the WiredTiger release dynamically
@@ -40,7 +39,8 @@ RUN mkdir /wiredtiger/build
 
 # Configure the WiredTiger build
 RUN cmake -S /wiredtiger -B /wiredtiger/build \
-    -DENABLE_SNAPPY=ON \
+    # -DENABLE_SNAPPY=1 \
+    -DHAVE_BUILTIN_EXTENSION_SNAPPY=1 \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_WERROR=0 \
     -DENABLE_QPL=0 \
@@ -53,5 +53,5 @@ RUN cmake --build /wiredtiger/build
 # Add `wt` utility to PATH
 RUN ln -s /wiredtiger/build/wt /usr/local/bin/wt
 
-# Set the entrypoint to run `wt dump` by default
-ENTRYPOINT ["wt", "dump"]
+# Set the entrypoint to run `wt` by default
+ENTRYPOINT ["wt"]
